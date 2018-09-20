@@ -97,17 +97,9 @@ void loop() { // run over and over
 
 void gsm_sendhttp() {
 
-//  mySerial.println("AT+CCLK?"); //CHECK STATUS OF RTC ONSTARTUP SYNCING
-//  runsl();
-//  delay(100);
-//  mySerial.println("AT+CLTS=1");  //ENABLE REAL TIME CLOCK SYNCHRONIZATION AND SET TIME 
-//  runsl();
-//  delay(100);
-//  mySerial.println("AT&W"); //SAVE NEW SETTINGS SO THAT SIM800L MODULE SETS TIME ON STARTUP SUBSEQUENTLY
-//  runsl();
-//  delay(100);
-
-  
+  mySerial.println("AT+CCLK?");
+  runsl();
+  delay(100);
   mySerial.println("AT");
   runsl();//Print GSM Status an the Serial Output;
   delay(4000);
@@ -199,3 +191,24 @@ void reset_sensor_values(){
   Serial.println("Turning sensor Heaters back ON....." );
   digitalWrite(relay_pin, LOW);
 }
+
+
+
+
+
+
+
+
+
+// **COMMENTS , READ HERE**
+
+
+//  mySerial.println("AT+CCLK?"); //CHECK STATUS OF RTC ONSTARTUP SYNCING
+//  runsl();
+//  delay(100);
+//  mySerial.println("AT+CLTS=1");  //ENABLE REAL TIME CLOCK SYNCHRONIZATION AND SET TIME 
+//  runsl();
+//  delay(100);
+//  mySerial.println("AT&W"); //SAVE NEW SETTINGS SO THAT SIM800L MODULE SETS TIME ON STARTUP SUBSEQUENTLY
+//  runsl();
+//  delay(100);
