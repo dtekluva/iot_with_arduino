@@ -36,16 +36,12 @@ void setup() {
 }
 
 void loop() { // run over and over
-//      json = "{\"co\":" +  String(avg_CO) + ",\"ch4\":" +  String(avg_CH4) + ",\"aq\":" +  String(avg_AQ) + ",\"h\":" +  String(avg_H) +"}";
-
-//      json = "{\"co\":" +  String(avg_CO) + ",\"ch4\":" +  String(avg_CH4) + ",\"aq\":" +  String(avg_AQ) + ",\"h\":" +  String(avg_H) + ",\"time\":" +  "\"String(time_stamp)\""  +"}";
-//      json = "{\"co\":" +  String(avg_CO) + ",\"ch4\":" +  String(avg_CH4) + ",\"aq\":" +  String(avg_AQ) + ",\"h\":" +  String(avg_H) + ",\"time\":" + time_stamp +"}";
 
       getSensorData(); //get average sensor val for the minute
-      json_();
-      Serial.println(json);
+      
+
       Serial.println(count);
-      // if (count == 270){ //270/60secs equals 4mins and 30secs. 30secs extra is given for the sending of the post request to makke a total of 5min interval per data post
+//       if (count == 270){ //270/60secs equals 4mins and 30secs. 30secs extra is given for the sending of the post request to makke a total of 5min interval per data post
       if (count == 60){
                 avg_CO = CO_Value / count ;
                 avg_CH4 = CH4_Value / count ;
@@ -57,6 +53,8 @@ void loop() { // run over and over
                 Serial.println("SENDING AVERAGE READINGS TO SERVER " );
           
                 digitalWrite(relay_pin, HIGH);
+                
+                Serial.println(time_stamp);
                 gsm_sendhttp(); 
           
                 //Start the GSM-Modul and start the transmisson
@@ -89,6 +87,11 @@ void gsm_sendhttp() {
   mySerial.println("AT");
   runsl();//Print GSM Status an the Serial Output;
   delay(4000);
+  mySerial.println("AT+CCLK?"); //CHECK STATUS OF RTC ONSTARTUP SYNCING
+  runsl();
+  delay(100);
+  time_stamp = mySerial.readString();
+  delay(100);
   mySerial.println("AT+SAPBR=3,1,Contype,GPRS");
   runsl();
   delay(100);
@@ -117,6 +120,7 @@ void gsm_sendhttp() {
   runsl();
   delay(100);
 //  mySerial.println("params=" + data1 + "~" + data2);
+  to_json_();
   mySerial.println(json);
   runsl();
   delay(10000);
@@ -171,7 +175,7 @@ String set_time_stamp() {
     delay(100);
 //
 //    time_stamp = mySerial.readString();
-//    time_stamp.replace("+CCLK:", "");
+//    delay(500);
 //    time_stamp.replace("OK", "");
 //    Serial.println(time_stamp);
 //    Serial.println(json);
@@ -179,9 +183,14 @@ String set_time_stamp() {
 };
 
 
-void json_(){
+void to_json_(){//serialize and prepare json data for sending
  StaticJsonBuffer<200> jsonBuffer;
   JsonObject& root = jsonBuffer.createObject();
+  time_stamp.replace("\n", "");
+  time_stamp.replace("\r", "");
+  time_stamp.replace("AT+CCLK?", "");
+  time_stamp.replace("+CCLK:", "");
+  time_stamp.replace("OK", "");
   root["co"] = avg_CO;
   root["ch4"] = avg_CH4;
   root["aq"] = avg_AQ;
@@ -189,10 +198,8 @@ void json_(){
   root["time"] = time_stamp;
   String place_holder;
   root.printTo(place_holder);
-
   json = place_holder;
-//  root.prettyPrintTo(Serial);
-//  json = Serial.readString();
+
 };
 
 
